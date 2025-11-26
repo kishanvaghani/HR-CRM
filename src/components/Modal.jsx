@@ -9,7 +9,6 @@ export default function Modal({ isOpen, onClose, children }) {
       {/* Modal Container */}
       <div className="fixed inset-0 flex items-center justify-center z-50">
         <div className="bg-white w-full max-w-md md:max-w-lg p-6 rounded-2xl shadow-lg border border-gray-200">
-
           {/* Close Button */}
           <div className="flex justify-end">
             <button

@@ -85,7 +85,7 @@ export default function InterviewModal({
     <div className="modal modal-open fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-40">
       <div className="modal-box w-full max-w-xs sm:max-w-lg md:max-w-2xl lg:max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Modal header */}
-        <div className="flex-shrink-0 px-4 pt-4">
+        <div className="shrink-0 px-4 pt-4">
           <h3 className="font-bold text-lg mb-6">
             {editingInterview ? "Edit Interview" : "Schedule New Interview"}
           </h3>
@@ -193,27 +193,7 @@ export default function InterviewModal({
                 </label>
               )}
             </div>
-            {/* Interview Round */}
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-semibold">
-                  Interview Round
-                </span>
-              </label>
-              <select
-                className="select select-bordered w-full focus:outline-none focus:ring-2 focus:ring-neutral"
-                value={newInterview.round}
-                onChange={(e) => handleInputChange("round", e.target.value)}
-              >
-                {(INTERVIEW_ROUND_LIST || []).map((round) => (
-                  <option key={round} value={round}>
-                    {round}
-                  </option>
-                ))}
-              </select>
-            </div>
 
-            {/* Repeat for each input field, using w-full */}
             {/* Current CTC */}
             <div className="form-control">
               <label className="label">
@@ -294,6 +274,25 @@ export default function InterviewModal({
                   </span>
                 </label>
               )}
+            </div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-semibold">
+                  Interview Round
+                </span>
+              </label>
+              <select
+                className="select select-bordered w-full focus:outline-none focus:ring-2 focus:ring-neutral"
+                value={newInterview.round}
+                onChange={(e) => handleInputChange("round", e.target.value)}
+              >
+                {(INTERVIEW_ROUND_LIST || []).map((round) => (
+                  <option key={round} value={round}>
+                    {round}
+                  </option>
+                ))}
+              </select>
             </div>
             {/* Expected Date of Joining */}
             <div className="form-control">
@@ -387,7 +386,7 @@ export default function InterviewModal({
           </div>
         </div>
         {/* Footer Buttons */}
-        <div className="modal-action mt-6 flex-shrink-0 px-4 pb-4 flex flex-col gap-2 sm:flex-row sm:gap-4">
+        <div className="modal-action mt-6 shrink-0 px-4 pb-4 flex flex-col gap-2 sm:flex-row sm:gap-4">
           <button
             className="btn btn-outline w-full sm:w-auto"
             onClick={onClose}

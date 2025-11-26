@@ -1,193 +1,3 @@
-// import useToast from "../hooks/useToast";
-
-// const getAvatarInitial = (candidate) => {
-//   if (!candidate || typeof candidate !== 'string') return '?';
-//   return candidate.charAt(0).toUpperCase();
-// };
-
-// const getCandidateName = (candidate) => {
-//   return candidate || 'Unknown Candidate';
-// };
-
-// export default function InterviewTable({
-//   interviews,
-//   title,
-//   badgeColor,
-//   onEdit,
-//   onDelete,
-//   onSendEmail,
-//   onStatusUpdate
-// }) {
-//   const { showSuccess, showError } = useToast();
-
-//   // Handle status change with toast
-//   const handleStatusChange = async (interviewId, newStatus) => {
-//     try {
-//       await onStatusUpdate(interviewId, { status: newStatus });
-//     } catch (error) {
-//       showError("Failed to update status");
-//     }
-//   };
-
-//   // Handle round change with toast
-//   const handleRoundChange = async (interviewId, newRound) => {
-//     try {
-//       await onStatusUpdate(interviewId, { round: newRound });
-//     } catch (error) {
-//       showError("Failed to update round");
-//     }
-//   };
-
-//   // Handle send email with toast feedback
-//   const handleSendEmail = async (interview) => {
-//     try {
-//       await onSendEmail(interview);
-//     } catch (error) {
-//       showError("Failed to send email");
-//     }
-//   };
-
-//   // Handle edit with toast feedback
-//   const handleEdit = async (interview) => {
-//     try {
-//       await onEdit(interview);
-//     } catch (error) {
-//       showError("Failed to load interview for editing");
-//     }
-//   };
-
-//   // Handle delete with confirmation and toast feedback
-//   const handleDelete = async (interviewId) => {
-//     if (window.confirm("Are you sure you want to delete this interview?")) {
-//       try {
-//         await onDelete(interviewId);
-//       } catch (error) {
-//         showError("Failed to delete interview");
-//       }
-//     }
-//   };
-
-//   return (
-//     <div className="bg-base-100 p-6 rounded-xl shadow-lg mb-6">
-//       <div className="flex items-center justify-between mb-4">
-//         <h3 className="text-xl font-semibold">
-//           {title}
-//         </h3>
-//         <span className={`badge ${badgeColor} badge-lg`}>
-//           {interviews.length} {interviews.length === 1 ? 'item' : 'items'}
-//         </span>
-//       </div>
-
-//       {interviews.length > 0 ? (
-//         <div className="overflow-x-auto">
-//           <table className="table table-zebra">
-//             <thead>
-//               <tr>
-//                 <th>Candidate</th>
-//                 <th>Email</th>
-//                 <th>Position</th>
-//                 <th>Date</th>
-//                 <th>Time</th>
-//                 <th>Round</th>
-//                 <th>Status</th>
-//                 <th>Actions</th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//               {interviews.map((item, i) => (
-//                 <tr key={i}>
-//                   <td>
-//                     <div className="flex items-center space-x-3">
-//                       <div className="avatar placeholder">
-//                         <div className="bg-neutral text-neutral-content p-2 rounded-full w-8">
-//                           <span className="text-xs">{getAvatarInitial(item?.candidate)}</span>
-//                         </div>
-//                       </div>
-//                       <div>
-//                         <div className="font-bold">{getCandidateName(item?.candidate)}</div>
-//                       </div>
-//                     </div>
-//                   </td>
-//                   <td>{item?.email || 'No email'}</td>
-//                   <td>{item?.position || 'No position'}</td>
-//                   <td>{item?.date || "Not set"}</td>
-//                   <td>{item?.time || "Not set"}</td>
-//                   <td>
-//                     <select
-//                       value={item?.round || '1st Round'}
-//                       onChange={(e) => handleRoundChange(item?._id, e.target.value)}
-//                       className="select select-bordered select-sm"
-//                     >
-//                       <option value="1st Round">1st Round</option>
-//                       <option value="2nd Round">2nd Round</option>
-//                       <option value="Final Round">Final Round</option>
-//                       <option value="Hired">Hired</option>
-//                       <option value="Rejected">Rejected</option>
-//                     </select>
-//                   </td>
-//                   <td>
-//                     <select
-//                       value={item?.status || 'Not Joined'}
-//                       onChange={(e) => handleStatusChange(item?._id, e.target.value)}
-//                       className="select select-bordered select-sm"
-//                     >
-//                       <option value="Not Joined">Not Joined</option>
-//                       <option value="Lack of Knowledge">Lack of Knowledge</option>
-//                       <option value="Need to do 2nd Round">Need to do 2nd Round</option>
-//                       <option value="Offer Sent">Offer Sent</option>
-//                       <option value="Offer Accepted">Offer Accepted</option>
-//                       <option value="Offer Declined">Offer Declined</option>
-//                     </select>
-//                   </td>
-//                   <td>
-//                     <div className="flex gap-1">
-//                       <button
-//                         className="btn btn-success btn-sm"
-//                         onClick={() => handleSendEmail(item)}
-//                         disabled={!item?.email}
-//                         title="Send Email"
-//                       >
-//                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-//                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-//                         </svg>
-//                       </button>
-//                       <button
-//                         className="btn btn-info btn-sm"
-//                         onClick={() => handleEdit(item)}
-//                         title="Edit Interview"
-//                       >
-//                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-//                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-//                         </svg>
-//                       </button>
-//                       <button
-//                         className="btn btn-error btn-sm"
-//                         onClick={() => handleDelete(item?._id)}
-//                         title="Delete Interview"
-//                       >
-//                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-//                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-//                         </svg>
-//                       </button>
-//                     </div>
-//                   </td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-//         </div>
-//       ) : (
-//         <div className="text-center p-8 text-base-content/60 bg-base-200 rounded-lg">
-//           <svg className="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-//             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-//           </svg>
-//           No interviews found
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
 import { useState } from "react";
 import useToast from "../hooks/useToast";
 import { INTERVIEW_ROUND_LIST, INTERVIEW_STATUS_LIST } from "../utils/constant";
@@ -292,7 +102,7 @@ export default function InterviewTable({
                     <td className="px-4 py-3">
                       <div className="flex items-center space-x-3">
                         <div className="avatar placeholder">
-                          <div className="bg-neutral text-neutral-content rounded-full w-10">
+                          <div className="bg-neutral text-neutral-content rounded-full p-4 w-12">
                             <span className="text-sm font-semibold">
                               {getAvatarInitial(item?.candidate)}
                             </span>
@@ -337,13 +147,10 @@ export default function InterviewTable({
                         onChange={(e) =>
                           handleRoundChange(item?._id, e.target.value)
                         }
-                        className="select select-bordered select-sm w-full max-w-[140px] focus:outline-none focus:ring-2 focus:ring-primary"
+                        disabled
+                        className="select select-bordered select-sm w-full max-w-[140px] 
+               focus:outline-none focus:ring-2 focus:ring-primary cursor-not-allowed opacity-60"
                       >
-                        {/* <option value="1st Round">1st Round</option>
-                        <option value="2nd Round">2nd Round</option>
-                        <option value="Final Round">Final Round</option>
-                        <option value="Hired">Hired</option>
-                        <option value="Rejected">Rejected</option> */}
                         <option value="" disabled>
                           Select Status
                         </option>
@@ -356,26 +163,12 @@ export default function InterviewTable({
                     </td>
 
                     <td className="px-4 py-3">
-                      {/* <select
-                        value={item?.status || "Not Joined"}
-                        onChange={(e) =>
-                          handleStatusChange(item?._id, e.target.value)
-                        }
-                        className="select select-bordered select-sm w-full max-w-[160px] focus:outline-none focus:ring-2 focus:ring-primary"
-                      >
-                        {Object.entries(objectOptions).map(([key, label]) => (
-                          <option key={key} value={key}>
-                            {label}
-                          </option>
-                        ))}
-                      </select> */}
-
                       <select
                         value={item?.status || ""}
                         onChange={(e) =>
                           handleStatusChange(item?._id, e.target.value)
                         }
-                        className="select select-bordered select-sm w-full max-w-[160px] focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="select select-bordered select-sm w-full max-w-40 focus:outline-none focus:ring-2 focus:ring-primary"
                       >
                         <option value="" disabled>
                           Select Status

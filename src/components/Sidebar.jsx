@@ -19,8 +19,8 @@ export default function Sidebar() {
         <Link key={item.path} to={item.path}>
           <div
             className={`p-3 rounded-lg mb-3 cursor-pointer ${
-              pathname === item.path ? "bg-blue-100" : "hover:bg-gray-100"}
-              ${pathname === item.path ? "text-black" : "hover:text-black"}
+              pathname === item.path ? "bg-blue-100" : "hover:bg-base-200"}
+              ${pathname === item.path ? "text-base-content" : "hover-text-base-content"}
               `}
           >
             {item.name}
