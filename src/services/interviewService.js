@@ -45,6 +45,12 @@ export const interviewService = {
     const response = await api.get(`/interviews/round/${round}`);
     return response;
   },
+
+  // 🔥 ADD THIS FUNCTION for Upcoming Interviews
+  async getUpcomingInterviews(filter = "all") {
+    const response = await api.get(`/interviews/upcoming?filter=${filter}`);
+    return response;
+  },
 };
 
 export default interviewService;

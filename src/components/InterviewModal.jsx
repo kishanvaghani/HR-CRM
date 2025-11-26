@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { INTERVIEW_ROUND_LIST } from "../utils/constant";
 
 export default function InterviewModal({
@@ -11,6 +11,38 @@ export default function InterviewModal({
   onSubmit,
 }) {
   const [formErrors, setFormErrors] = useState({});
+  const [isUsingDefaultLink, setIsUsingDefaultLink] = useState(true);
+  const [emailStatus, setEmailStatus] = useState("");
+
+  // Default meeting link
+  const DEFAULT_MEETING_LINK = "https://meet.google.com/eeu-xnbf-yzb";
+
+  // Check if round is Pending
+  const isPendingRound = newInterview.round === "Pending";
+
+  // Pre-fill default meeting link when creating new interview
+  useEffect(() => {
+    if (showModal && !editingInterview) {
+      setNewInterview(prev => ({
+        ...prev,
+        meetingLink: DEFAULT_MEETING_LINK,
+        round: "Pending" // Set default round to Pending
+      }));
+      setIsUsingDefaultLink(true);
+      setEmailStatus("");
+    }
+  }, [showModal, editingInterview, setNewInterview]);
+
+  // Update email status when round changes
+  useEffect(() => {
+    if (newInterview.round === "Pending") {
+      setEmailStatus("Meeting link will be sent when round is scheduled");
+    } else if (['1st Round', '2nd Round'].includes(newInterview.round)) {
+      setEmailStatus("Meeting link will be automatically sent via email");
+    } else {
+      setEmailStatus("");
+    }
+  }, [newInterview.round]);
 
   if (!showModal) return null;
 
@@ -59,12 +91,26 @@ export default function InterviewModal({
     if (!validateForm()) {
       return;
     }
-    console.log("Submitting interview data:", {
+    
+    // Ensure meeting link is set (use default if empty and not pending)
+    const interviewData = {
       ...newInterview,
+      meetingLink: isPendingRound ? "" : (newInterview.meetingLink || DEFAULT_MEETING_LINK)
+    };
+
+    console.log("Submitting interview data:", {
+      ...interviewData,
       isEdit: !!editingInterview,
       editingId: editingInterview?._id,
     });
-    onSubmit();
+    
+    // Update the state with ensured meeting link
+    setNewInterview(interviewData);
+    
+    // Call onSubmit after a small delay to ensure state is updated
+    setTimeout(() => {
+      onSubmit();
+    }, 0);
   };
 
   // Handle input changes with error clearing
@@ -73,11 +119,65 @@ export default function InterviewModal({
       ...prev,
       [field]: value,
     }));
+    
+    // Check if user is manually typing (not using default)
+    if (field === "meetingLink") {
+      if (value === DEFAULT_MEETING_LINK) {
+        setIsUsingDefaultLink(true);
+      } else if (value !== DEFAULT_MEETING_LINK && value !== "") {
+        setIsUsingDefaultLink(false);
+      }
+    }
+    
+    // Update email status when round changes
+    if (field === "round") {
+      if (value === "Pending") {
+        setEmailStatus("Meeting link will be sent when round is scheduled");
+      } else if (['1st Round', '2nd Round'].includes(value)) {
+        setEmailStatus("Meeting link will be automatically sent via email");
+      } else {
+        setEmailStatus("");
+      }
+    }
+    
     if (formErrors[field]) {
       setFormErrors((prev) => ({
         ...prev,
         [field]: "",
       }));
+    }
+  };
+
+  // Reset meeting link to default
+  const handleResetMeetingLink = () => {
+    if (!isPendingRound) {
+      setNewInterview(prev => ({
+        ...prev,
+        meetingLink: DEFAULT_MEETING_LINK
+      }));
+      setIsUsingDefaultLink(true);
+    }
+  };
+
+  // Use default link
+  const handleUseDefaultLink = () => {
+    if (!isPendingRound) {
+      setNewInterview(prev => ({
+        ...prev,
+        meetingLink: DEFAULT_MEETING_LINK
+      }));
+      setIsUsingDefaultLink(true);
+    }
+  };
+
+  // Clear meeting link for manual input
+  const handleClearForManualInput = () => {
+    if (!isPendingRound) {
+      setNewInterview(prev => ({
+        ...prev,
+        meetingLink: ""
+      }));
+      setIsUsingDefaultLink(false);
     }
   };
 
@@ -170,7 +270,6 @@ export default function InterviewModal({
                 </label>
               )}
             </div>
-            {/* ...(repeat the rest with w-full on inputs and proper gaps) */}
             {/* Position */}
             <div className="form-control">
               <label className="label">
@@ -275,9 +374,13 @@ export default function InterviewModal({
                 </label>
               )}
             </div>
+
+            {/* Divider */}
             <div className="flex w-full flex-col md:col-span-2">
-              <div className="divider divider-warning">OR</div>
+              <div className="divider divider-warning">Interview Details</div>
             </div>
+
+            {/* Interview Round */}
             <div className="form-control">
               <label className="label">
                 <span className="label-text font-semibold">
@@ -295,7 +398,17 @@ export default function InterviewModal({
                   </option>
                 ))}
               </select>
+              {emailStatus && (
+                <label className="label">
+                  <span className={`label-text-alt ${
+                    isPendingRound ? 'text-warning' : 'text-success'
+                  }`}>
+                    {emailStatus}
+                  </span>
+                </label>
+              )}
             </div>
+
             {/* Expected Date of Joining */}
             <div className="form-control">
               <label className="label">
@@ -336,24 +449,85 @@ export default function InterviewModal({
                 onChange={(e) => handleInputChange("time", e.target.value)}
               />
             </div>
-            {/* Meeting Link */}
-            <div className="form-control md:col-span-2 ">
-              <label className="label">
-                <span className="label-text font-semibold">Meeting Link</span>
-              </label>
+
+            {/* Meeting Link - Enhanced with Pending round logic */}
+            <div className="form-control md:col-span-2">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
+                <label className="label p-0">
+                  <span className="label-text font-semibold">
+                    Meeting Link
+                    {isPendingRound && (
+                      <span className="text-warning ml-2">(Disabled for Pending Round)</span>
+                    )}
+                  </span>
+                </label>
+                {!isPendingRound && (
+                  <div className="flex gap-2">
+                    {!isUsingDefaultLink && (
+                      <button
+                        type="button"
+                        className="btn btn-xs btn-primary"
+                        onClick={handleUseDefaultLink}
+                      >
+                        Use Default
+                      </button>
+                    )}
+                    {isUsingDefaultLink && (
+                      <button
+                        type="button"
+                        className="btn btn-xs btn-outline"
+                        onClick={handleClearForManualInput}
+                      >
+                        Write Custom
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+              
               <input
                 type="text"
-                placeholder="Google Meet, Zoom, or Teams link"
-                className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-neutral"
-                value={newInterview.meetingLink}
-                onChange={(e) =>
-                  handleInputChange("meetingLink", e.target.value)
+                placeholder={
+                  isPendingRound 
+                    ? "Meeting link disabled for Pending round" 
+                    : isUsingDefaultLink 
+                      ? "Using default meeting link" 
+                      : "Enter custom meeting link..."
                 }
+                className={`input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-neutral ${
+                  isPendingRound ? 'input-disabled bg-gray-100 cursor-not-allowed' : ''
+                }`}
+                value={isPendingRound ? "" : newInterview.meetingLink}
+                onChange={(e) => !isPendingRound && handleInputChange("meetingLink", e.target.value)}
+                disabled={isPendingRound}
               />
+              
+              <div className="flex justify-between items-center mt-1">
+                <label className="label p-0">
+                  <span className={`label-text-alt ${
+                    isPendingRound ? 'text-warning' : 'text-info'
+                  }`}>
+                    {isPendingRound 
+                      ? "❌ Meeting link disabled - select a scheduled round" 
+                      : isUsingDefaultLink 
+                        ? "✓ Using default meeting link" 
+                        : "↳ Writing custom meeting link"
+                    }
+                  </span>
+                </label>
+                {!isPendingRound && (
+                  <span className="label-text-alt text-gray-500">
+                    Default: meet.google.com/eeu-xnbf-yzb
+                  </span>
+                )}
+              </div>
             </div>
+
+            {/* Divider */}
             <div className="flex w-full flex-col md:col-span-2">
-              <div className="divider divider-warning">OR</div>
+              <div className="divider divider-warning">Additional Information</div>
             </div>
+
             {/* Notice Period */}
             <div className="form-control">
               <label className="label">

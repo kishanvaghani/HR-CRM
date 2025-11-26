@@ -192,7 +192,6 @@ export default function Interviews() {
   const resetForm = () => setNewInterview(initialInterviewState);
 
   const handleSubmitInterview = async () => {
-    debugger;
     if (
       !newInterview.candidate ||
       !newInterview.phone ||
