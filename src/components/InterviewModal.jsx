@@ -275,7 +275,9 @@ export default function InterviewModal({
                 </label>
               )}
             </div>
-
+            <div className="flex w-full flex-col md:col-span-2">
+              <div className="divider divider-warning">OR</div>
+            </div>
             <div className="form-control">
               <label className="label">
                 <span className="label-text font-semibold">
@@ -348,6 +350,9 @@ export default function InterviewModal({
                   handleInputChange("meetingLink", e.target.value)
                 }
               />
+            </div>
+            <div className="flex w-full flex-col md:col-span-2">
+              <div className="divider divider-warning">OR</div>
             </div>
             {/* Notice Period */}
             <div className="form-control">
