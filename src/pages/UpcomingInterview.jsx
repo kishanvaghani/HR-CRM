@@ -20,7 +20,9 @@ export default function UpcomingInterviews() {
 
       console.log("🔍 Fetching interviews with:", apiFilter);
 
-      const res = await axios.get(`http://localhost:5000/api/interviews/filter`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/interviews/filter`
+      );
 
       console.log("📥 API Response:", res.data);
 
@@ -37,7 +39,7 @@ export default function UpcomingInterviews() {
     }
   };
 
-   const getAvatarInitial = (name) => {
+  const getAvatarInitial = (name) => {
     if (!name || typeof name !== "string") return "?";
     return name.charAt(0).toUpperCase();
   };
@@ -47,31 +49,41 @@ export default function UpcomingInterviews() {
     fetchData();
   }, [filter]);
 
-  const filteredData = filter === "all" ? interviews : interviews.filter(i => i.round === filter);
+  const filteredData =
+    filter === "all"
+      ? interviews
+      : interviews.filter((i) => i.round === filter);
 
   // ============ Format Helpers ============
-  const formatDate = (d) => d ? new Date(d).toLocaleDateString("en-US", { year:"numeric", month:"short", day:"numeric" }) : "Not set";
-  const initial = (name) => name ? name.charAt(0).toUpperCase() : "?";
+  const formatDate = (d) =>
+    d
+      ? new Date(d).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })
+      : "Not set";
+  const initial = (name) => (name ? name.charAt(0).toUpperCase() : "?");
 
   // ============ Loading UI ============
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-base-200">
-      <div className="text-center">
-        <span className="loading loading-spinner loading-lg mb-2"></span>
-        <p className="font-medium">Loading Interviews...</p>
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-base-200">
+        <div className="text-center">
+          <span className="loading loading-spinner loading-lg mb-2"></span>
+          <p className="font-medium">Loading Interviews...</p>
+        </div>
       </div>
-    </div>
-  );
+    );
 
   return (
     <div className="min-h-screen bg-base-200 p-6">
       <div className="max-w-7xl mx-auto">
-        
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Upcoming Interviews</h1>
-          <button 
-            onClick={fetchData} 
+          <button
+            onClick={fetchData}
             className="btn btn-outline btn-sm"
             disabled={loading}
           >
@@ -92,7 +104,7 @@ export default function UpcomingInterviews() {
               <option value="2nd Round">2nd Round</option>
               <option value="other">Other Rounds</option>
             </select>
-            
+
             <div className="badge badge-primary badge-lg">
               {filteredData.length} interviews
             </div>
@@ -104,10 +116,7 @@ export default function UpcomingInterviews() {
           <div className="alert alert-error mb-6">
             <div>
               <span>{error}</span>
-              <button 
-                onClick={fetchData} 
-                className="btn btn-sm btn-ghost ml-4"
-              >
+              <button onClick={fetchData} className="btn btn-sm btn-ghost ml-4">
                 Try Again
               </button>
             </div>
@@ -133,7 +142,7 @@ export default function UpcomingInterviews() {
                   <th className="font-semibold">Status</th>
                 </tr>
               </thead>
-              
+
               <tbody>
                 {filteredData.length > 0 ? (
                   filteredData.map((item) => (
@@ -149,7 +158,9 @@ export default function UpcomingInterviews() {
                             </div>
                           </div>
                           <div>
-                            <div className="font-bold">{item.candidate || "Unknown"}</div>
+                            <div className="font-bold">
+                              {item.candidate || "Unknown"}
+                            </div>
                             <div className="text-sm text-gray-500">
                               {item.phone || "No phone"}
                             </div>
@@ -217,18 +228,16 @@ export default function UpcomingInterviews() {
                   <tr>
                     <td colSpan="11" className="text-center py-10">
                       <div className="flex flex-col items-center justify-center">
-                        
                         <h3 className="text-lg font-semibold mb-2">
                           No Interviews Found
                         </h3>
                         <p className="text-gray-500 mb-4">
-                          {interviews.length === 0 
-                            ? "No interview data available" 
-                            : `No interviews match the "${filter}" filter`
-                          }
+                          {interviews.length === 0
+                            ? "No interview data available"
+                            : `No interviews match the "${filter}" filter`}
                         </p>
-                        <button 
-                          onClick={fetchData} 
+                        <button
+                          onClick={fetchData}
                           className="btn btn-primary btn-sm"
                         >
                           Refresh Data
@@ -245,7 +254,10 @@ export default function UpcomingInterviews() {
         {/* Data Summary */}
         {interviews.length > 0 && (
           <div className="mt-6 text-sm text-gray-600">
-            <p>Showing {filteredData.length} of {interviews.length} total interviews</p>
+            <p>
+              Showing {filteredData.length} of {interviews.length} total
+              interviews
+            </p>
           </div>
         )}
       </div>

@@ -264,7 +264,7 @@ export default function Interviews() {
 
   const sendMail = async (interview) => {
     try {
-      await axios.post("http://localhost:5000/api/email/send", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/email/send`, {
         email: interview.email,
         candidate: interview.candidate,
         position: interview.position,
