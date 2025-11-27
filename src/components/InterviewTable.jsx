@@ -184,7 +184,7 @@ export default function InterviewTable({
                         <button
                           className="btn btn-success btn-sm btn-square"
                           onClick={() => setEmailConfirm(item)}
-                          disabled={!item?.email}
+                          disabled={true}
                           title={
                             item?.email ? "Send Email" : "No email available"
                           }
