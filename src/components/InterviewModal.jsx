@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { INTERVIEW_ROUND_LIST } from "../utils/constant";
 
 export default function InterviewModal({
@@ -14,7 +14,11 @@ export default function InterviewModal({
   const [isUsingDefaultLink, setIsUsingDefaultLink] = useState(true);
   const [emailStatus, setEmailStatus] = useState("");
   const [emailUsed, setEmailUsed] = useState(false);
-
+  const [phoneExists, setPhoneExists] = useState(false);
+  const [phoneChecking, setPhoneChecking] = useState(false);
+  const [emailChecking, setEmailChecking] = useState(false);
+  const emailTimeoutRef = useRef(null);
+  const phoneTimeoutRef = useRef(null);
 
   // Default meeting link
   const DEFAULT_MEETING_LINK = "https://meet.google.com/eeu-xnbf-yzb";
@@ -22,7 +26,7 @@ export default function InterviewModal({
   // Check if round is Pending
   const isPendingRound = newInterview.round === "Pending";
 
-  // Pre-fill default meeting link when creating new interview
+  // Pre-fill default meeting link when creating new interview and reset states
   useEffect(() => {
     if (showModal && !editingInterview) {
       setNewInterview((prev) => ({
@@ -32,6 +36,14 @@ export default function InterviewModal({
       }));
       setIsUsingDefaultLink(true);
       setEmailStatus("");
+      setEmailUsed(false);
+      setPhoneExists(false);
+      setFormErrors({});
+    } else if (showModal && editingInterview) {
+      // Reset duplicate states when editing
+      setEmailUsed(false);
+      setPhoneExists(false);
+      setFormErrors({});
     }
   }, [showModal, editingInterview, setNewInterview]);
 
@@ -47,6 +59,96 @@ export default function InterviewModal({
   }, [newInterview.round]);
 
   if (!showModal) return null;
+
+  // Real-time phone check
+  const checkPhoneDuplicate = async (phone) => {
+    if (!phone || phone.length < 10) {
+      setPhoneExists(false);
+      return;
+    }
+
+    if (editingInterview && editingInterview.phone === phone) {
+      setPhoneExists(false);
+      return;
+    }
+
+    setPhoneChecking(true);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/interviews/check-phone`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: phone.trim() }),
+        }
+      );
+
+      const data = await res.json();
+      setPhoneExists(data.exists);
+
+      if (data.exists) {
+        setFormErrors((prev) => ({
+          ...prev,
+          phone: "⚠️ This phone number is already in use",
+        }));
+      } else {
+        setFormErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.phone;
+          return newErrors;
+        });
+      }
+    } catch (err) {
+      console.error("Phone check error:", err);
+    } finally {
+      setPhoneChecking(false);
+    }
+  };
+
+  // Real-time email check
+  const checkEmailDuplicate = async (email) => {
+    if (!email || !email.includes("@")) {
+      setEmailUsed(false);
+      return;
+    }
+
+    if (editingInterview && editingInterview.email === email) {
+      setEmailUsed(false);
+      return;
+    }
+
+    setEmailChecking(true);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/interviews/check-email`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email.trim() }),
+        }
+      );
+
+      const data = await res.json();
+      setEmailUsed(data.exists);
+
+      if (data.exists) {
+        setFormErrors((prev) => ({
+          ...prev,
+          email: "⚠️ This email is already in use",
+        }));
+      } else {
+        setFormErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.email;
+          return newErrors;
+        });
+      }
+    } catch (err) {
+      console.error("Email check error:", err);
+    } finally {
+      setEmailChecking(false);
+    }
+  };
 
   // Validate form before submission
   const validateForm = () => {
@@ -64,7 +166,7 @@ export default function InterviewModal({
 
     if (!newInterview.phone?.trim()) {
       errors.phone = "Phone number is required";
-    } else if (!/^[0-9]{10}$/.test(newInterview.phone)) {
+    } else if (!/^[0-9]{10}$/.test(newInterview.phone.replace(/\D/g, ""))) {
       errors.phone = "Phone number must be 10 digits";
     }
 
@@ -82,6 +184,14 @@ export default function InterviewModal({
 
     if (newInterview.totalExperience && isNaN(newInterview.totalExperience)) {
       errors.totalExperience = "Total experience must be a number";
+    }
+
+    // Check duplicates only if they exist from API check
+    if (phoneExists) {
+      errors.phone = "⚠️ This phone number is already in use";
+    }
+    if (emailUsed) {
+      errors.email = "⚠️ This email is already in use";
     }
 
     setFormErrors(errors);
@@ -102,13 +212,6 @@ export default function InterviewModal({
         : newInterview.meetingLink || DEFAULT_MEETING_LINK,
     };
 
-    console.log("Submitting interview data:", {
-      ...interviewData,
-      isEdit: !!editingInterview,
-      editingId: editingInterview?._id,
-    });
-
-    // Update the state with ensured meeting link
     setNewInterview(interviewData);
 
     // Call onSubmit after a small delay to ensure state is updated
@@ -123,6 +226,21 @@ export default function InterviewModal({
       ...prev,
       [field]: value,
     }));
+
+    // Trigger real-time checks
+    if (field === "phone") {
+      if (phoneTimeoutRef.current) clearTimeout(phoneTimeoutRef.current);
+      phoneTimeoutRef.current = setTimeout(() => {
+        checkPhoneDuplicate(value);
+      }, 1000); // 2s delay
+    } else if (field === "email") {
+      if (emailTimeoutRef.current) {
+        clearTimeout(emailTimeoutRef.current);
+      }
+      emailTimeoutRef.current = setTimeout(() => {
+        checkEmailDuplicate(value);
+      }, 1000); // 2s delay
+    }
 
     // Check if user is manually typing (not using default)
     if (field === "meetingLink") {
@@ -185,26 +303,19 @@ export default function InterviewModal({
     }
   };
 
-
-  // const checkEmail = async (email) => {
-  //   if (!email) return setEmailUsed(false);
-
-  //   try {
-  //     const res = await fetch(
-  //       "http://localhost:5000/api/interviews/check-email",
-  //       {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify({ email }),
-  //       }
-  //     );
-
-  //     const data = await res.json();
-  //     setEmailUsed(data.exists);
-  //   } catch (err) {
-  //     console.log("Email check error:", err);
-  //   }
-  // };
+  // Enhanced onClose handler: reset all states
+  const handleModalClose = () => {
+    // Reset all local states
+    setEmailUsed(false);
+    setPhoneExists(false);
+    setEmailChecking(false);
+    setPhoneChecking(false);
+    setFormErrors({});
+    setEmailStatus("");
+    if (emailTimeoutRef.current) clearTimeout(emailTimeoutRef.current);
+    if (phoneTimeoutRef.current) clearTimeout(phoneTimeoutRef.current);
+    onClose();
+  };
 
   return (
     <div className="modal modal-open fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-40">
@@ -226,7 +337,6 @@ export default function InterviewModal({
             }
           `}</style>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {/* Input fields: use w-full for mobile */}
             {/* Candidate Name */}
             <div className="form-control">
               <label className="label">
@@ -254,14 +364,19 @@ export default function InterviewModal({
             {/* Email */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Email *</span>
+                <span className="label-text font-semibold">
+                  Email *{" "}
+                  {emailChecking && (
+                    <span className="text-blue-500">⏳ Checking...</span>
+                  )}
+                </span>
               </label>
               <input
                 type="email"
                 placeholder="Enter email address"
                 className={`input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-neutral ${
                   formErrors.email ? "input-error" : ""
-                }`}
+                } ${emailUsed ? "border-2 border-red-500" : ""}`}
                 value={newInterview.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
               />
@@ -273,20 +388,22 @@ export default function InterviewModal({
                 </label>
               )}
             </div>
-{/* 
-            
-
-            {/* PHONE */}
+            {/* Phone */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Phone *</span>
+                <span className="label-text font-semibold">
+                  Phone *{" "}
+                  {phoneChecking && (
+                    <span className="text-blue-500">⏳ Checking...</span>
+                  )}
+                </span>
               </label>
               <input
                 type="tel"
-                placeholder="Enter Phone address"
+                placeholder="Enter 10-digit phone number"
                 className={`input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-neutral ${
                   formErrors.phone ? "input-error" : ""
-                }`}
+                } ${phoneExists ? "border-2 border-red-500" : ""}`}
                 value={newInterview?.phone}
                 onChange={(e) => handleInputChange("phone", e.target.value)}
               />
@@ -320,7 +437,6 @@ export default function InterviewModal({
                 </label>
               )}
             </div>
-
             {/* Current CTC */}
             <div className="form-control">
               <label className="label">
@@ -402,12 +518,10 @@ export default function InterviewModal({
                 </label>
               )}
             </div>
-
             {/* Divider */}
             <div className="flex w-full flex-col md:col-span-2">
               <div className="divider divider-warning">Interview Details</div>
             </div>
-
             {/* Interview Round */}
             <div className="form-control">
               <label className="label">
@@ -438,7 +552,6 @@ export default function InterviewModal({
                 </label>
               )}
             </div>
-
             {/* Expected Date of Joining */}
             <div className="form-control">
               <label className="label">
@@ -479,8 +592,7 @@ export default function InterviewModal({
                 onChange={(e) => handleInputChange("time", e.target.value)}
               />
             </div>
-
-            {/* Meeting Link - Enhanced with Pending round logic */}
+            {/* Meeting Link */}
             <div className="form-control md:col-span-2">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
                 <label className="label p-0">
@@ -516,7 +628,6 @@ export default function InterviewModal({
                   </div>
                 )}
               </div>
-
               <input
                 type="text"
                 placeholder={
@@ -538,7 +649,6 @@ export default function InterviewModal({
                 }
                 disabled={isPendingRound}
               />
-
               <div className="flex justify-between items-center mt-1">
                 <label className="label p-0">
                   <span
@@ -560,14 +670,12 @@ export default function InterviewModal({
                 )}
               </div>
             </div>
-
             {/* Divider */}
             <div className="flex w-full flex-col md:col-span-2">
               <div className="divider divider-warning">
                 Additional Information
               </div>
             </div>
-
             {/* Notice Period */}
             <div className="form-control">
               <label className="label">
@@ -605,30 +713,26 @@ export default function InterviewModal({
           </div>
         </div>
         {/* Footer Buttons */}
-        <div className="modal-action mt-6 shrink-0 px-4 pb-4 flex flex-col gap-2 sm:flex-row sm:gap-4">
+        <div className="shrink-0 px-4 pb-4 pt-2 border-t flex justify-end gap-2">
           <button
-            className="btn btn-outline w-full sm:w-auto"
-            onClick={onClose}
+            onClick={handleModalClose}
+            className="btn btn-outline"
             disabled={loading}
           >
             Cancel
           </button>
-
           <button
-            className="btn btn-neutral w-full sm:w-auto"
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={
+              loading ||
+              phoneExists ||
+              emailUsed ||
+              phoneChecking ||
+              emailChecking
+            }
+            className="btn btn-primary"
           >
-            {loading ? (
-              <>
-                <span className="loading loading-spinner loading-sm"></span>
-                {editingInterview ? "Updating..." : "Adding..."}
-              </>
-            ) : editingInterview ? (
-              "Update Interview"
-            ) : (
-              "Add Interview"
-            )}
+            {loading ? "Saving..." : editingInterview ? "Update" : "Add"}
           </button>
         </div>
       </div>
