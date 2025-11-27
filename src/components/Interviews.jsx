@@ -138,17 +138,11 @@ export default function Interviews() {
       return 0;
     });
   };
-  console.log("====================================");
-  console.log(INTERVIEW_ROUNDS["PENDING"]);
-  console.log("====================================");
   const pendingInterviews = sortedInterviews(
     filterInterviewsBySearch(
       interviews.filter((item) => item.round === INTERVIEW_ROUNDS["PENDING"])
     )
   );
-  console.log("====================================");
-  console.log(pendingInterviews);
-  console.log("====================================");
   const firstRoundInterviews = sortedInterviews(
     filterInterviewsBySearch(
       interviews.filter((item) => item.round === INTERVIEW_ROUNDS["FIRSTROUND"])
