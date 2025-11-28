@@ -3,7 +3,7 @@ const checkEmail = async (email) => {
 
     try {
       const res = await fetch(
-        "http://localhost:5000/api/interviews/check-email",
+        `${import.meta.env.VITE_API_URL}/api/interviews/check-email`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -331,7 +331,7 @@ export default function InterviewModal({
           className="flex-1 overflow-y-auto px-4 pb-4"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          <style jsx>{`
+          <style >{`
             .flex-1.overflow-y-auto::-webkit-scrollbar {
               display: none;
             }
