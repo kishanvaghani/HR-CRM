@@ -1,11 +1,11 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 const api = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   withCredentials: true,
 });
@@ -13,7 +13,7 @@ const api = axios.create({
 export const candidateService = {
   // Get all candidates
   async getAllCandidates() {
-    const response = await api.get('/candidates');
+    const response = await api.get("/candidates");
     return response;
   },
 
@@ -25,7 +25,7 @@ export const candidateService = {
 
   // Create new candidate
   async createCandidate(candidateData) {
-    const response = await api.post('/candidates', candidateData);
+    const response = await api.post("/candidates", candidateData);
     return response;
   },
 
@@ -41,7 +41,6 @@ export const candidateService = {
     return response;
   },
 
-  
   async updateCandidateStatus(id, status) {
     const response = await api.patch(`/candidates/${id}/status`, { status });
     return response;
@@ -57,21 +56,19 @@ export const candidateService = {
     return response;
   },
 
- 
   async uploadResume(id, formData) {
     const response = await api.post(`/candidates/${id}/resume`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
     return response;
   },
 
- 
   async getCandidateAnalytics() {
-    const response = await api.get('/candidates/analytics');
+    const response = await api.get("/candidates/analytics");
     return response;
-  }
+  },
 };
 
 export default candidateService;

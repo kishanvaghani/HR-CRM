@@ -1,5 +1,5 @@
 const checkEmail = async (email) => {
-    if (!email) return setEmailUsed(false);
+  if (!email) return setEmailUsed(false);
 
     try {
       const res = await fetch(
@@ -11,9 +11,9 @@ const checkEmail = async (email) => {
         }
       );
 
-      const data = await res.json();
-      setEmailUsed(data.exists);
-    } catch (err) {
-      console.log("Email check error:", err);
-    }
-  };
+    const data = await res.json();
+    setEmailUsed(data.exists);
+  } catch (err) {
+    console.log("Email check error:", err);
+  }
+};
