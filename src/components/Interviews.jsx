@@ -262,22 +262,22 @@ export default function Interviews() {
     }
   };
 
-  const sendMail = async (interview) => {
-    try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/email/send`, {
-        email: interview.email,
-        candidate: interview.candidate,
-        position: interview.position,
-        date: interview.date,
-        time: interview.time,
-        meetingLink: interview.meetingLink || "https://meet.google.com/",
-      });
-      showSuccess("Email sent successfully!");
-    } catch (err) {
-      console.error(err);
-      showError("Failed to send email");
-    }
-  };
+  // const sendMail = async (interview) => {
+  //   try {
+  //     await axios.post(`${import.meta.env.VITE_API_URL}/api/email/send`, {
+  //       email: interview.email,
+  //       candidate: interview.candidate,
+  //       position: interview.position,
+  //       date: interview.date,
+  //       time: interview.time,
+  //       meetingLink: interview.meetingLink || "https://meet.google.com/",
+  //     });
+  //     showSuccess("Email sent successfully!");
+  //   } catch (err) {
+  //     console.error(err);
+  //     showError("Failed to send email");
+  //   }
+  // };
 
   return (
     <div className="p-6 space-y-8">
@@ -345,7 +345,7 @@ export default function Interviews() {
             badgeColor="badge-neutral"
             onEdit={(interview) => dispatch(showModal(interview))}
             onDelete={handleDeleteInterview}
-            onSendEmail={sendMail}
+            // onSendEmail={sendMail}
             onStatusUpdate={handleStatusOrRoundUpdate}
           />
 
@@ -355,7 +355,7 @@ export default function Interviews() {
             badgeColor="badge-secondary"
             onEdit={(interview) => dispatch(showModal(interview))}
             onDelete={handleDeleteInterview}
-            onSendEmail={sendMail}
+            // onSendEmail={sendMail}
             onStatusUpdate={handleStatusOrRoundUpdate}
           />
 
@@ -365,7 +365,7 @@ export default function Interviews() {
             badgeColor="badge-accent"
             onEdit={(interview) => dispatch(showModal(interview))}
             onDelete={handleDeleteInterview}
-            onSendEmail={sendMail}
+            // onSendEmail={sendMail}
             onStatusUpdate={handleStatusOrRoundUpdate}
           />
 
@@ -375,7 +375,7 @@ export default function Interviews() {
             badgeColor="badge-error"
             onEdit={(interview) => dispatch(showModal(interview))}
             onDelete={handleDeleteInterview}
-            onSendEmail={sendMail}
+            // onSendEmail={sendMail}
             onStatusUpdate={handleStatusOrRoundUpdate}
           />
 
@@ -385,7 +385,7 @@ export default function Interviews() {
             badgeColor="badge-success"
             onEdit={(interview) => dispatch(showModal(interview))}
             onDelete={handleDeleteInterview}
-            onSendEmail={sendMail}
+            // onSendEmail={sendMail}
             onStatusUpdate={handleStatusOrRoundUpdate}
           />
 
@@ -395,7 +395,7 @@ export default function Interviews() {
             badgeColor="badge-error"
             onEdit={(interview) => dispatch(showModal(interview))}
             onDelete={handleDeleteInterview}
-            onSendEmail={sendMail}
+            // onSendEmail={sendMail}
             onStatusUpdate={handleStatusOrRoundUpdate}
           />
         </>
