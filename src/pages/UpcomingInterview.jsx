@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { convertTo12Hour } from "../utils/convertTo12Hour";
+import { isToday } from "../utils/todays";
 
 export default function UpcomingInterviews() {
   const [interviews, setInterviews] = useState([]);
@@ -201,7 +202,17 @@ export default function UpcomingInterviews() {
 
                     <td>{item.position || "-"}</td>
 
-                    <td>{formatDate(item.date)}</td>
+                    <td>
+                      {" "}
+                      <span
+                        className={`text-sm ${
+                          isToday(item.date) ? "today" : ""
+                        }`}
+                      >
+                        {formatDate(item.date)}
+                      </span>
+                      {/* {formatDate(item.date)} */}
+                    </td>
 
                     <td>{convertTo12Hour(item?.time || "") || "Not set"}</td>
 

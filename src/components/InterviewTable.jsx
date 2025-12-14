@@ -2,6 +2,7 @@ import { useState } from "react";
 import useToast from "../hooks/useToast";
 import { INTERVIEW_ROUND_LIST, INTERVIEW_STATUS_LIST } from "../utils/constant";
 import { convertTo12Hour } from "../utils/convertTo12Hour";
+import { isToday } from "../utils/todays";
 
 const getAvatarInitial = (candidate) => {
   if (!candidate || typeof candidate !== "string") return "?";
@@ -95,7 +96,7 @@ export default function InterviewTable({
               </thead>
 
               <tbody>
-                {interviews.map((item, i) => (
+                {(interviews || []).map((item, i) => (
                   <tr key={i} className="hover">
                     <td className="px-4 py-3">
                       <div className="flex items-center space-x-3">
@@ -132,7 +133,13 @@ export default function InterviewTable({
                     </td>
 
                     <td className="px-4 py-3">
-                      <span className="text-sm">{item?.date || "Not set"}</span>
+                      <span
+                        className={`text-sm ${
+                          isToday(item.date) ? "today" : ""
+                        }`}
+                      >
+                        {item?.date || "Not set"}
+                      </span>
                     </td>
 
                     <td className="px-4 py-3">
