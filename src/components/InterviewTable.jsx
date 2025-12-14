@@ -1,6 +1,7 @@
 import { useState } from "react";
 import useToast from "../hooks/useToast";
 import { INTERVIEW_ROUND_LIST, INTERVIEW_STATUS_LIST } from "../utils/constant";
+import { convertTo12Hour } from "../utils/convertTo12Hour";
 
 const getAvatarInitial = (candidate) => {
   if (!candidate || typeof candidate !== "string") return "?";
@@ -135,7 +136,9 @@ export default function InterviewTable({
                     </td>
 
                     <td className="px-4 py-3">
-                      <span className="text-sm">{item?.time || "Not set"}</span>
+                      <span className="text-sm">
+                        {convertTo12Hour(item?.time || "") || "Not set"}
+                      </span>
                     </td>
 
                     <td className="px-4 py-3">

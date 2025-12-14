@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { convertTo12Hour } from "../utils/convertTo12Hour";
 
 export default function UpcomingInterviews() {
   const [interviews, setInterviews] = useState([]);
@@ -202,7 +203,7 @@ export default function UpcomingInterviews() {
 
                     <td>{formatDate(item.date)}</td>
 
-                    <td>{item.time || "Not set"}</td>
+                    <td>{convertTo12Hour(item?.time || "") || "Not set"}</td>
 
                     <td>
                       <span className="badge badge-outline px-3 py-0 text-sm inline-block truncate max-w-32">
