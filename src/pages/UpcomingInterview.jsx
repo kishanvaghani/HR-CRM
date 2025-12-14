@@ -123,8 +123,16 @@ export default function UpcomingInterviews() {
   };
 
   const getAvatarInitial = (name) => {
-    if (!name || typeof name !== "string") return "?";
-    return name.charAt(0).toUpperCase();
+    if (name === null || name === undefined) return "?";
+
+    // If it's a number or numeric string (e.g. "10", "25")
+    if (!isNaN(name)) {
+      return String(name);
+    }
+
+    if (typeof name !== "string") return "?";
+
+    return name.trim().charAt(0).toUpperCase() || "?";
   };
 
   // ============ Loading UI ============

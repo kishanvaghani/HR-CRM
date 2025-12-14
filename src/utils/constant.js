@@ -49,3 +49,15 @@ export const INTERVIEW_STATUS = {
 };
 
 export const INTERVIEW_STATUS_LIST = Object.values(INTERVIEW_STATUS);
+export const getAvatarInitial = (name) => {
+  if (name === null || name === undefined) return "?";
+
+  // If it's a number or numeric string (e.g. "10", "25")
+  if (!isNaN(name)) {
+    return String(name);
+  }
+
+  if (typeof name !== "string") return "?";
+
+  return name.trim().charAt(0).toUpperCase() || "?";
+};

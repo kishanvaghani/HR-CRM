@@ -1,13 +1,12 @@
 import { useState } from "react";
 import useToast from "../hooks/useToast";
-import { INTERVIEW_ROUND_LIST, INTERVIEW_STATUS_LIST } from "../utils/constant";
+import {
+  getAvatarInitial,
+  INTERVIEW_ROUND_LIST,
+  INTERVIEW_STATUS_LIST,
+} from "../utils/constant";
 import { convertTo12Hour } from "../utils/convertTo12Hour";
 import { isToday } from "../utils/todays";
-
-const getAvatarInitial = (candidate) => {
-  if (!candidate || typeof candidate !== "string") return "?";
-  return candidate.charAt(0).toUpperCase();
-};
 
 const getCandidateName = (candidate) => {
   return candidate || "Unknown Candidate";
@@ -101,10 +100,8 @@ export default function InterviewTable({
                     <td className="px-4 py-3">
                       <div className="flex items-center space-x-3">
                         <div className="avatar placeholder">
-                          <div className="bg-neutral text-neutral-content rounded-full p-4 w-12">
-                            <span className="text-sm font-semibold">
-                              {getAvatarInitial(item?.candidate)}
-                            </span>
+                          <div className="bg-neutral text-neutral-content rounded-full w-10 h-10 flex items-center justify-center text-lg font-bold">
+                            {getAvatarInitial((i + 1)?.toString())}
                           </div>
                         </div>
                         <div className="min-w-0 flex-1">
