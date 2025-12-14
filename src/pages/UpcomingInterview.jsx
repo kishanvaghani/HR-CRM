@@ -166,18 +166,19 @@ export default function UpcomingInterviews() {
                   <th className="font-semibold">Expected CTC</th>
                   <th className="font-semibold">Joining Date</th>
                   <th className="font-semibold">Meeting Link</th>
+                  <th className="font-semibold">Mail status</th>
                   <th className="font-semibold">Status</th>
                 </tr>
               </thead>
 
               <tbody>
-                {data.map((item) => (
+                {(data || []).map((item, i) => (
                   <tr key={item._id} className="hover">
                     <td>
                       <div className="flex items-center gap-3">
                         <div className="avatar placeholder w-10 h-10 shrink-0">
                           <div className="bg-neutral text-neutral-content rounded-full w-10 h-10 flex items-center justify-center text-lg font-bold">
-                            {getAvatarInitial(item.candidate)}
+                            {getAvatarInitial((i + 1)?.toString())}
                           </div>
                         </div>
                         <div className="min-w-0 flex-1">
@@ -230,6 +231,15 @@ export default function UpcomingInterviews() {
                       ) : (
                         <span className="text-gray-400 text-sm">No link</span>
                       )}
+                    </td>
+                    <td>
+                      <span
+                        className={`badge badge-ghost ${
+                          item?.emailSent ? "badge-success" : "badge-danger"
+                        }`}
+                      >
+                        {item?.emailSent ? "sent" : "failed"}
+                      </span>
                     </td>
 
                     <td>
