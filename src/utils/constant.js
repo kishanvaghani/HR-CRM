@@ -51,6 +51,7 @@ export const INTERVIEW_STATUS = {
   Missed: "Missed",
   CHEATING: "Cheating",
   LACK_OF_CONFIDENCE: "Lack of Confidence",
+  MEDICAL_EMERGENCY: "Medical Emergency",
 };
 
 export const INTERVIEW_STATUS_LIST = Object.values(INTERVIEW_STATUS);
