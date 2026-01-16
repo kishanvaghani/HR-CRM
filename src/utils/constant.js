@@ -46,6 +46,7 @@ export const INTERVIEW_STATUS = {
   OFFER_SENT: "Offer Sent",
   OFFER_ACCEPTED: "Offer Accepted",
   OFFER_DECLINED: "Offer Declined",
+  MISMATCH_REQUIREMENT: "Mismatch Requirement",
 };
 
 export const INTERVIEW_STATUS_LIST = Object.values(INTERVIEW_STATUS);
