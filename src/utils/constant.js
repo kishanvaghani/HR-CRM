@@ -49,6 +49,7 @@ export const INTERVIEW_STATUS = {
   MISMATCH_REQUIREMENT: "Mismatch Requirement",
   BACKEND_HEAVY: "Backend Heavy",
   Missed: "Missed",
+  CHEATING: "Cheating",
   LACK_OF_CONFIDENCE: "Lack of Confidence",
 };
 
