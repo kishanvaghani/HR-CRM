@@ -49,6 +49,7 @@ export const INTERVIEW_STATUS = {
   MISMATCH_REQUIREMENT: "Mismatch Requirement",
   BACKEND_HEAVY: "Backend Heavy",
   Missed: "Missed",
+  LACK_OF_CONFIDENCE: "Lack of Confidence",
 };
 
 export const INTERVIEW_STATUS_LIST = Object.values(INTERVIEW_STATUS);
