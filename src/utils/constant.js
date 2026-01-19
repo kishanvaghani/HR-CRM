@@ -51,6 +51,7 @@ export const INTERVIEW_STATUS = {
   Missed: "Missed",
   CHEATING: "Cheating",
   LACK_OF_CONFIDENCE: "Lack of Confidence",
+  LACK_OF_COMMUNICATION: "Lack of Communication",
   MEDICAL_EMERGENCY: "Medical Emergency",
 };
 
