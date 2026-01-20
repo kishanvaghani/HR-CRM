@@ -53,6 +53,7 @@ export const INTERVIEW_STATUS = {
   LACK_OF_CONFIDENCE: "Lack of Confidence",
   LACK_OF_COMMUNICATION: "Lack of Communication",
   MEDICAL_EMERGENCY: "Medical Emergency",
+  HIRE_THIS_CANDIDATE: "Hire this candidate",
 };
 
 export const INTERVIEW_STATUS_LIST = Object.values(INTERVIEW_STATUS);
