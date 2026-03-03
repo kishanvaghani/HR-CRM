@@ -43,6 +43,7 @@ export const INTERVIEW_STATUS = {
   NOT_JOINED: "Not Joined",
   LACK_OF_KNOWLEDGE: "Lack of Knowledge",
   SECOND_ROUND_REQUIRED: "Need to do 2nd Round",
+  RESCHEDULE: "Reschedule",
   OFFER_SENT: "Offer Sent",
   OFFER_ACCEPTED: "Offer Accepted",
   OFFER_DECLINED: "Offer Declined",
