@@ -161,7 +161,7 @@ export default function UpcomingInterviews() {
         )}
       </div>
       {data.length > 0 ? (
-        <div className=" rounded-xl shadow-lg overflow-hidden">
+        <div className="rounded-xl shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="table table-zebra w-full">
               <thead className="bg-base-200">
@@ -307,7 +307,7 @@ export default function UpcomingInterviews() {
         </div>
 
         {/* Filter */}
-        <div className="bg-white p-4 rounded-xl shadow mb-8">
+        <div className="p-4 rounded-xl shadow mb-8">
           <div className="flex items-center gap-4">
             <select
               className="select select-bordered w-full max-w-xs"
