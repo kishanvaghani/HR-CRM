@@ -7,12 +7,12 @@ export default function Sidebar() {
     { name: "Dashboard", path: "/" },
     { name: "Candidates", path: "/candidates" },
     { name: "Interviews", path: "/interviews" },
-    { name: "Upcoming Interviews", path: "/upcoming-interviews" }, 
+    { name: "Upcoming Interviews", path: "/upcoming-interviews" },
     { name: "Settings", path: "/settings" },
   ];
 
   return (
-    <aside className="hidden md:block w-64 fixed h-screen shadow-md p-6 overflow-y-auto bg-white">
+    <aside className="hidden md:block w-64 fixed h-screen shadow-md p-6 overflow-y-auto">
       <h1 className="text-xl font-bold mb-10">Interview System</h1>
 
       {menu.map((item) => (

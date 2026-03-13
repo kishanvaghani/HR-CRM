@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   fetchInterviews,
@@ -109,7 +108,7 @@ export default function Interviews() {
         item?.position?.toLowerCase().includes(lower) ||
         item?.round?.toLowerCase().includes(lower) ||
         item?.status?.toLowerCase().includes(lower) ||
-        item?.currentCompany?.toLowerCase().includes(lower)
+        item?.currentCompany?.toLowerCase().includes(lower),
     );
   };
 
@@ -140,39 +139,43 @@ export default function Interviews() {
   };
   const pendingInterviews = sortedInterviews(
     filterInterviewsBySearch(
-      interviews.filter((item) => item.round === INTERVIEW_ROUNDS["PENDING"])
-    )
+      interviews.filter((item) => item.round === INTERVIEW_ROUNDS["PENDING"]),
+    ),
   );
   const firstRoundInterviews = sortedInterviews(
     filterInterviewsBySearch(
-      interviews.filter((item) => item.round === INTERVIEW_ROUNDS["FIRSTROUND"])
-    )
+      interviews.filter(
+        (item) => item.round === INTERVIEW_ROUNDS["FIRSTROUND"],
+      ),
+    ),
   );
 
   const secondRoundInterviews = sortedInterviews(
     filterInterviewsBySearch(
       interviews.filter(
-        (item) => item.round === INTERVIEW_ROUNDS["SECONDROUND"]
-      )
-    )
+        (item) => item.round === INTERVIEW_ROUNDS["SECONDROUND"],
+      ),
+    ),
   );
 
   const finalRoundInterviews = sortedInterviews(
     filterInterviewsBySearch(
-      interviews.filter((item) => item.round === INTERVIEW_ROUNDS["FINALROUND"])
-    )
+      interviews.filter(
+        (item) => item.round === INTERVIEW_ROUNDS["FINALROUND"],
+      ),
+    ),
   );
 
   const hiredInterviews = sortedInterviews(
     filterInterviewsBySearch(
-      interviews.filter((item) => item.round === INTERVIEW_ROUNDS["HIRED"])
-    )
+      interviews.filter((item) => item.round === INTERVIEW_ROUNDS["HIRED"]),
+    ),
   );
 
   const rejectedInterviews = sortedInterviews(
     filterInterviewsBySearch(
-      interviews.filter((item) => item.round === INTERVIEW_ROUNDS["REJECTED"])
-    )
+      interviews.filter((item) => item.round === INTERVIEW_ROUNDS["REJECTED"]),
+    ),
   );
 
   const totalResults =
@@ -203,7 +206,7 @@ export default function Interviews() {
           updateInterview({
             id: selectedInterview._id,
             interviewData: newInterview,
-          })
+          }),
         ).unwrap();
         showSuccess("Interview updated successfully!");
       } else {
@@ -222,7 +225,7 @@ export default function Interviews() {
 
   const handleStatusOrRoundUpdate = async (interviewId, updates) => {
     const currentInterview = interviews.find(
-      (item) => item._id === interviewId
+      (item) => item._id === interviewId,
     );
     if (!currentInterview) {
       showError("Interview not found");
@@ -234,7 +237,7 @@ export default function Interviews() {
         updateInterview({
           id: interviewId,
           interviewData: { ...currentInterview, ...updates },
-        })
+        }),
       ).unwrap();
 
       if (updates.round) {
@@ -254,7 +257,7 @@ export default function Interviews() {
     }
 
     try {
-      await dispatch(deleteInterviewThunk(interviewId)).unwrap();
+      // await dispatch(deleteInterviewThunk(interviewId)).unwrap();
       showSuccess("Interview deleted successfully!");
     } catch (err) {
       console.error("Error deleting interview", err);

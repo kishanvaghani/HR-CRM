@@ -23,7 +23,7 @@ export default function UpcomingInterviews() {
       console.log("🔍 Fetching interviews with:", apiFilter);
 
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/interviews/filter`
+        `${import.meta.env.VITE_API_URL}/api/interviews/filter`,
       );
 
       console.log("📥 API Response:", res.data);
@@ -85,7 +85,7 @@ export default function UpcomingInterviews() {
     if (filter === "other") {
       // Other is rounds except 1st Round and 2nd Round
       return data.filter(
-        (i) => i.round !== "1st Round" && i.round !== "2nd Round"
+        (i) => i.round !== "1st Round" && i.round !== "2nd Round",
       );
     }
     return data.filter((i) => i.round === filter);
@@ -161,7 +161,7 @@ export default function UpcomingInterviews() {
         )}
       </div>
       {data.length > 0 ? (
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className=" rounded-xl shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="table table-zebra w-full">
               <thead className="bg-base-200">
@@ -348,7 +348,7 @@ export default function UpcomingInterviews() {
         {renderInterviewTable(
           filteredUpcoming,
           "Upcoming Interviews",
-          getDaysUntilDate(upcomingInterviews[0]?.date)
+          getDaysUntilDate(upcomingInterviews[0]?.date),
         )}
 
         {/* Yesterday Interviews Table */}
