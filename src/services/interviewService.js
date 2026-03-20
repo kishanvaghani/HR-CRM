@@ -11,8 +11,8 @@ const api = axios.create({
 });
 
 export const interviewService = {
-  async getAllInterviews() {
-    const response = await api.get("/interviews");
+  async getAllInterviews(filter = "all") {
+    const response = await api.get(`/interviews?filter=${filter}`);
     return response;
   },
 

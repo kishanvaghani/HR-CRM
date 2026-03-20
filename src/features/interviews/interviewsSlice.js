@@ -1,76 +1,89 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { interviewService } from '../../services/interviewService';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { interviewService } from "../../services/interviewService";
 
 export const fetchInterviews = createAsyncThunk(
-  'interviews/fetchInterviews',
+  "interviews/fetchInterviews",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await interviewService.getAllInterviews();
-      
+      console.log("lll", _);
+
+      const response = await interviewService.getAllInterviews(_);
+
       if (response.data && response.data.success) {
-        return response.data.data; 
+        return response.data.data;
       } else {
-        return response.data || []; 
+        return response.data || [];
       }
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch interviews');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch interviews",
+      );
     }
-  }
+  },
 );
 
 export const addInterview = createAsyncThunk(
-  'interviews/addInterview',
+  "interviews/addInterview",
   async (interviewData, { rejectWithValue }) => {
     try {
       const response = await interviewService.createInterview(interviewData);
-      
+
       if (response.data && response.data.success) {
-        return response.data.data; 
+        return response.data.data;
       } else {
-        return response.data; 
+        return response.data;
       }
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to add interview');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to add interview",
+      );
     }
-  }
+  },
 );
 
 export const updateInterview = createAsyncThunk(
-  'interviews/updateInterview',
+  "interviews/updateInterview",
   async ({ id, interviewData }, { rejectWithValue }) => {
     try {
-      const response = await interviewService.updateInterview(id, interviewData);
-     
+      const response = await interviewService.updateInterview(
+        id,
+        interviewData,
+      );
+
       if (response.data && response.data.success) {
-        return response.data.data; 
+        return response.data.data;
       } else {
-        return response.data; 
+        return response.data;
       }
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to update interview');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update interview",
+      );
     }
-  }
+  },
 );
 
 export const deleteInterview = createAsyncThunk(
-  'interviews/deleteInterview',
+  "interviews/deleteInterview",
   async (id, { rejectWithValue }) => {
     try {
       const response = await interviewService.deleteInterview(id);
-      
+
       if (response.data && response.data.success) {
-        return id; 
+        return id;
       } else {
-        return id; 
+        return id;
       }
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to delete interview');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete interview",
+      );
     }
-  }
+  },
 );
 
 const interviewsSlice = createSlice({
-  name: 'interviews',
+  name: "interviews",
   initialState: {
     items: [],
     selectedInterview: null,
@@ -82,10 +95,10 @@ const interviewsSlice = createSlice({
     },
     // Add filters state
     filters: {
-      search: '',
-      status: '',
-      round: ''
-    }
+      search: "",
+      status: "",
+      round: "",
+    },
   },
   reducers: {
     showModal: (state, action) => {
@@ -117,9 +130,9 @@ const interviewsSlice = createSlice({
     },
     clearInterviewFilters: (state) => {
       state.filters = {
-        search: '',
-        status: '',
-        round: ''
+        search: "",
+        status: "",
+        round: "",
       };
     },
   },
@@ -140,7 +153,7 @@ const interviewsSlice = createSlice({
         state.error = action.payload;
         state.items = []; // Reset items on error
       })
-      
+
       // Add interview
       .addCase(addInterview.pending, (state) => {
         state.loading = true;
@@ -158,7 +171,7 @@ const interviewsSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Update interview
       .addCase(updateInterview.pending, (state) => {
         state.loading = true;
@@ -167,7 +180,9 @@ const interviewsSlice = createSlice({
       .addCase(updateInterview.fulfilled, (state, action) => {
         state.loading = false;
         if (action.payload && action.payload._id) {
-          const index = state.items.findIndex(item => item._id === action.payload._id);
+          const index = state.items.findIndex(
+            (item) => item._id === action.payload._id,
+          );
           if (index !== -1) {
             state.items[index] = action.payload;
           }
@@ -179,10 +194,10 @@ const interviewsSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Delete interview
       .addCase(deleteInterview.fulfilled, (state, action) => {
-        state.items = state.items.filter(item => item._id !== action.payload);
+        state.items = state.items.filter((item) => item._id !== action.payload);
       })
       .addCase(deleteInterview.rejected, (state, action) => {
         state.error = action.payload;
