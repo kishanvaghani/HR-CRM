@@ -4,32 +4,32 @@ import { convertTo12Hour } from "../utils/convertTo12Hour";
 import { isToday } from "../utils/todays";
 
 export default function UpcomingInterviews() {
-  const [interviews, setInterviews] = useState([]);
+  const [interviews, setInterviews] = useState({
+    today: [],
+    tomorrow: [],
+    yesterday: [],
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("all");
 
   // ================== API CALL ==================
-  const fetchData = async () => {
+  const fetchData = async (dateRange = "recent3") => {
     try {
       setLoading(true);
       setError("");
 
-      // Convert UI filter to backend filter if needed (unused in current API call)
-      let apiFilter = filter;
-      if (filter === "1st Round") apiFilter = "1st-round";
-      if (filter === "2nd Round") apiFilter = "2nd-round";
-
-      console.log("🔍 Fetching interviews with:", apiFilter);
-
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/interviews/filter`,
+        `${import.meta.env.VITE_API_URL}/api/interviews/filter?dateRange=${dateRange}`,
       );
 
-      console.log("📥 API Response:", res.data);
-
-      if (res.data.success) {
-        setInterviews(res.data.data);
+      const grouped = res.data?.data || res.data;
+      if (grouped) {
+        setInterviews({
+          today: Array.isArray(grouped.today) ? grouped.today : [],
+          tomorrow: Array.isArray(grouped.tomorrow) ? grouped.tomorrow : [],
+          yesterday: Array.isArray(grouped.yesterday) ? grouped.yesterday : [],
+        });
       } else {
         setError("API returned no success response");
       }
@@ -39,44 +39,6 @@ export default function UpcomingInterviews() {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Group interviews by date: today, yesterday, and upcoming
-  const groupInterviewsByDate = (data) => {
-    const today = new Date();
-    const yesterday = new Date();
-    yesterday.setDate(today.getDate() - 1);
-
-    // Helper to reset time part of date to 00:00:00 for accurate comparison
-    const resetTime = (date) =>
-      new Date(date.getFullYear(), date.getMonth(), date.getDate());
-
-    const todayReset = resetTime(today).getTime();
-    const yesterdayReset = resetTime(yesterday).getTime();
-
-    const todayInterviews = [];
-    const yesterdayInterviews = [];
-    const upcomingInterviews = [];
-
-    data.forEach((interview) => {
-      if (!interview.date) {
-        upcomingInterviews.push(interview); // No date = upcoming
-        return;
-      }
-
-      const interviewDate = new Date(interview.date);
-      const interviewDateReset = resetTime(interviewDate).getTime();
-
-      if (interviewDateReset === todayReset) {
-        todayInterviews.push(interview);
-      } else if (interviewDateReset === yesterdayReset) {
-        yesterdayInterviews.push(interview);
-      } else if (interviewDateReset > todayReset) {
-        upcomingInterviews.push(interview);
-      }
-    });
-
-    return { todayInterviews, yesterdayInterviews, upcomingInterviews };
   };
 
   // Apply UI filter to a given array of interviews
@@ -93,15 +55,16 @@ export default function UpcomingInterviews() {
 
   // Auto reload on filter change
   useEffect(() => {
-    fetchData();
+    fetchData("recent3");
   }, [filter]);
 
-  const { todayInterviews, yesterdayInterviews, upcomingInterviews } =
-    groupInterviewsByDate(interviews);
-
-  const filteredToday = applyFilter(todayInterviews);
-  const filteredYesterday = applyFilter(yesterdayInterviews);
-  const filteredUpcoming = applyFilter(upcomingInterviews);
+  const filteredToday = applyFilter(interviews.today);
+  const filteredYesterday = applyFilter(interviews.yesterday);
+  const filteredTomorrow = applyFilter(interviews.tomorrow);
+  const totalInterviews =
+    interviews.today.length +
+    interviews.yesterday.length +
+    interviews.tomorrow.length;
 
   // ============ Format Helpers ============
   const formatDate = (d) =>
@@ -112,15 +75,6 @@ export default function UpcomingInterviews() {
           day: "numeric",
         })
       : "Not set";
-
-  const getDaysUntilDate = (dateString) => {
-    if (!dateString) return "TBD";
-    const today = new Date();
-    const targetDate = new Date(dateString);
-    const diffTime = targetDate - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays > 0 ? `${diffDays} days` : "Today";
-  };
 
   const getAvatarInitial = (name) => {
     if (name === null || name === undefined) return "?";
@@ -279,11 +233,14 @@ export default function UpcomingInterviews() {
             No Interviews Found
           </h3>
           <p className="text-gray-500 mb-4">
-            {interviews.length === 0
+            {totalInterviews === 0
               ? "No interview data available"
               : `No ${title.toLowerCase()} matching the "${filter}" filter`}
           </p>
-          <button onClick={fetchData} className="btn btn-primary btn-sm">
+          <button
+            onClick={() => fetchData("recent3")}
+            className="btn btn-primary btn-sm"
+          >
             Refresh Data
           </button>
         </div>
@@ -298,7 +255,7 @@ export default function UpcomingInterviews() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Upcoming Interviews</h1>
           <button
-            onClick={fetchData}
+            onClick={() => fetchData("recent3")}
             className="btn btn-outline btn-sm"
             disabled={loading}
           >
@@ -323,7 +280,7 @@ export default function UpcomingInterviews() {
             <div className="badge badge-primary badge-lg">
               {filteredToday.length +
                 filteredYesterday.length +
-                filteredUpcoming.length}{" "}
+                filteredTomorrow.length}{" "}
               interviews
             </div>
           </div>
@@ -334,7 +291,10 @@ export default function UpcomingInterviews() {
           <div className="alert alert-error mb-6">
             <div>
               <span>{error}</span>
-              <button onClick={fetchData} className="btn btn-sm btn-ghost ml-4">
+              <button
+                onClick={() => fetchData("recent3")}
+                className="btn btn-sm btn-ghost ml-4"
+              >
                 Try Again
               </button>
             </div>
@@ -344,25 +304,25 @@ export default function UpcomingInterviews() {
         {/* Today Interviews Table */}
         {renderInterviewTable(filteredToday, "Today's Interviews", "Priority")}
 
-        {/* Upcoming Interviews Table */}
+        {/* Tomorrow Interviews Table */}
         {renderInterviewTable(
-          filteredUpcoming,
-          "Upcoming Interviews",
-          getDaysUntilDate(upcomingInterviews[0]?.date),
+          filteredTomorrow,
+          "Tomorrow's Interviews",
+          "Tomorrow",
         )}
 
         {/* Yesterday Interviews Table */}
         {renderInterviewTable(filteredYesterday, "Yesterday's Interviews")}
 
         {/* Data Summary */}
-        {interviews.length > 0 && (
+        {totalInterviews > 0 && (
           <div className="mt-6 text-sm text-gray-600">
             <p>
               Showing{" "}
               {filteredToday.length +
                 filteredYesterday.length +
-                filteredUpcoming.length}{" "}
-              of {interviews.length} total interviews
+                filteredTomorrow.length}{" "}
+              of {totalInterviews} total interviews
             </p>
           </div>
         )}
