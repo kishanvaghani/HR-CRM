@@ -8,6 +8,7 @@ export default function Sidebar() {
     { name: "Candidates", path: "/candidates" },
     { name: "Interviews", path: "/interviews" },
     { name: "Upcoming Interviews", path: "/upcoming-interviews" },
+    { name: "Rejected Candidates", path: "/rejected-candidates" },
     { name: "Settings", path: "/settings" },
   ];
 
