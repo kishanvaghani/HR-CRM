@@ -57,7 +57,7 @@ export default function Interviews() {
   const showInitialLoader = loading && interviews.length === 0;
 
   useEffect(() => {
-    dispatch(fetchInterviews("not_rejected"));
+    dispatch(fetchInterviews());
     // dispatch(fetchInterviews("only_rejected"));
   }, []);
 
